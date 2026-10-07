@@ -1,5 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
@@ -93,6 +94,7 @@ class _CameraScreenState extends State<CameraScreen>
     appBar: AppBar(
       backgroundColor: Colors.black,
       foregroundColor: Colors.white,
+      systemOverlayStyle: SystemUiOverlayStyle.light,
       title: const Text('Chụp giao dịch'),
       actions: [
         IconButton(

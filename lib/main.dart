@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -52,6 +53,9 @@ class TransferLensApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialApp(
     title: 'TransferLens',
+    locale: const Locale('vi'),
+    supportedLocales: const [Locale('vi'), Locale('en')],
+    localizationsDelegates: GlobalMaterialLocalizations.delegates,
     debugShowCheckedModeBanner: false,
     theme: AppTheme.light,
     darkTheme: AppTheme.dark,

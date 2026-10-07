@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../domain/transaction.dart';
 
@@ -14,10 +15,13 @@ class AppTheme {
       scaffoldBackgroundColor: brightness == Brightness.light
           ? const Color(0xFFF5F7F4)
           : const Color(0xFF101A17),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         centerTitle: false,
         elevation: 0,
+        systemOverlayStyle: brightness == Brightness.light
+            ? SystemUiOverlayStyle.dark
+            : SystemUiOverlayStyle.light,
       ),
       cardTheme: CardThemeData(
         elevation: 0,
