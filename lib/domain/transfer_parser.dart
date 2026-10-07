@@ -109,14 +109,14 @@ class TransferParser {
     'transaction id',
   ];
   static final _money = RegExp(
-    r'(?:[-+]?\s*)(\d{1,3}(?:[.,\s]\d{3})+(?:[.,]00)?|\d+)(?:\s*)(VND|VNĐ|đ|₫|dong)?',
+    r'(?<![\w.,])[-+]?\s*(\d(?:[\d.,\s]*\d)?)(?:\s*)(VND|VNĐ|đ|₫|dong)?(?![\d.,])',
     caseSensitive: false,
   );
 
   ParsedTransfer parse(String rawText) {
     final lines = rawText
         .split(RegExp(r'[\r\n]+'))
-        .map((s) => s.trim())
+        .map((s) => s.replaceAll(RegExp(r'\s+'), ' ').trim())
         .where((s) => s.isNotEmpty)
         .toList();
     final warnings = <String>[];

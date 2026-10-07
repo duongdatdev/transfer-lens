@@ -84,6 +84,11 @@ void main() {
   test('rejects ambiguous unlabeled amounts', () {
     expect(parser.parse('150.000 VND\n250.000 VND').amount, isNull);
   });
+  test('never extracts a partial value from malformed monetary tokens', () {
+    for (final value in ['150.00 VND', '100,50 VND', '1,234.567 VND']) {
+      expect(parser.parse('Số tiền: $value').amount, isNull);
+    }
+  });
   test('prioritizes a labeled amount over a larger currency amount', () {
     expect(parser.parse('9.000.000 VND\nSố tiền: 150.000 VND').amount, 150000);
   });
