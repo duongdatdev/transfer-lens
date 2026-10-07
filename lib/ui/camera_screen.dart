@@ -147,10 +147,27 @@ class _CameraScreenState extends State<CameraScreen>
                       onTapDown: (details) async {
                         final current = controller;
                         if (current == null || capturing) return;
+                        final ratio = current.value.aspectRatio > 1
+                            ? 1 / current.value.aspectRatio
+                            : current.value.aspectRatio;
+                        final previewWidth =
+                            constraints.maxWidth < constraints.maxHeight * ratio
+                            ? constraints.maxWidth
+                            : constraints.maxHeight * ratio;
+                        final previewHeight = previewWidth / ratio;
+                        final preview = Rect.fromLTWH(
+                          (constraints.maxWidth - previewWidth) / 2,
+                          (constraints.maxHeight - previewHeight) / 2,
+                          previewWidth,
+                          previewHeight,
+                        );
+                        if (!preview.contains(details.localPosition)) return;
                         final point = Offset(
-                          (details.localPosition.dx / constraints.maxWidth)
+                          ((details.localPosition.dx - preview.left) /
+                                  preview.width)
                               .clamp(0, 1),
-                          (details.localPosition.dy / constraints.maxHeight)
+                          ((details.localPosition.dy - preview.top) /
+                                  preview.height)
                               .clamp(0, 1),
                         );
                         setState(() => focusPoint = details.localPosition);
