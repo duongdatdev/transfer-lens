@@ -1,0 +1,82 @@
+"""Record a Flutter integration walkthrough on a dedicated Android emulator."""
+from pathlib import Path
+import os
+import subprocess
+import time
+import sys
+import re
+
+sys.stdout.reconfigure(encoding='utf-8')
+
+ROOT = Path(__file__).resolve().parents[1]
+SDK = Path(os.environ.get('ANDROID_HOME', 'D:/Android'))
+ADB = str(SDK / 'platform-tools/adb.exe')
+FLUTTER = str(Path(os.environ.get('FLUTTER_HOME', 'C:/Users/DuongDat/develop/flutter')) / 'bin/flutter.bat')
+APP = 'dev.duongdat.transfer_lens'
+OUT = ROOT / 'output/demo'
+OUT.mkdir(parents=True, exist_ok=True)
+LOG = ROOT / 'tmp/demo-test.log'
+
+def adb(*args, **kwargs):
+    return subprocess.run([ADB, '-s', 'emulator-5554', *args], check=True, **kwargs)
+
+recording = None
+timeline = []
+seen_steps = set()
+recording_start = None
+def stop_recording():
+    if recording is not None and recording.poll() is None:
+        pid = adb('shell', 'pidof', 'screenrecord', capture_output=True, text=True).stdout.strip()
+        if pid: adb('shell', 'kill', '-2', pid)
+        recording.wait(timeout=15)
+
+def export_screens():
+    screens = ROOT / 'docs/screenshots'
+    screens.mkdir(parents=True, exist_ok=True)
+    names = adb('shell', 'run-as', APP, 'ls', 'app_flutter/demo_screenshots', capture_output=True, text=True).stdout.splitlines()
+    for name in names:
+        data = adb('exec-out', 'run-as', APP, 'cat', f'app_flutter/demo_screenshots/{name}', capture_output=True).stdout
+        (screens / name).write_bytes(data)
+    return len(names)
+
+with LOG.open('w', encoding='utf-8') as log:
+    command = [FLUTTER, 'test', 'integration_test/demo_test.dart', '-d', 'emulator-5554']
+    if '--fast' in sys.argv: command.append('--dart-define=FAST_DEMO=true')
+    test = subprocess.Popen(command, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT)
+    started = time.monotonic()
+    while test.poll() is None:
+        content = LOG.read_text(encoding='utf-8', errors='replace')
+        if recording is None and 'DEMO_RECORDING_START' in content:
+            recording = subprocess.Popen([ADB, '-s', 'emulator-5554', 'shell', 'screenrecord', '--size', '720x1600', '--bit-rate', '3000000', '--time-limit', '180', '/sdcard/transfer-lens-demo.mp4'], stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+            print('Recording the actual app walkthrough...', flush=True)
+            recording_start = time.monotonic()
+        for label in re.findall(r'DEMO_STEP: (.+)', content):
+            if label not in seen_steps and recording_start is not None:
+                timeline.append((time.monotonic() - recording_start, label))
+                seen_steps.add(label)
+        if recording is not None and 'DEMO_RECORDING_END' in content:
+            stop_recording()
+            exported = export_screens()
+            break
+        if time.monotonic() - started > 900:
+            test.terminate()
+            raise TimeoutError('Demo test exceeded 15 minutes')
+        time.sleep(1)
+    code = test.wait(timeout=30)
+stop_recording()
+if code:
+    print(LOG.read_text(encoding='utf-8', errors='replace')[-6000:])
+    raise SystemExit(code)
+if recording is None:
+    raise RuntimeError('The test never signaled recording start')
+adb('pull', '/sdcard/transfer-lens-demo.mp4', str(OUT / 'transfer-lens-demo.mp4'), stdout=subprocess.DEVNULL)
+def timestamp(seconds):
+    millis = max(0, int(seconds * 1000))
+    return f'{millis // 3600000:02}:{millis // 60000 % 60:02}:{millis // 1000 % 60:02},{millis % 1000:03}'
+end_time = time.monotonic() - recording_start - 20
+segments = []
+for i, (start, label) in enumerate(timeline):
+    end = timeline[i+1][0] if i+1 < len(timeline) else end_time
+    segments.append(f'{i+1}\n{timestamp(start)} --> {timestamp(max(start + 1, end))}\n{label}\n')
+(OUT / 'demo.srt').write_text('\n'.join(segments), encoding='utf-8')
+print(f'Saved video and {exported} native screenshots/metrics.', flush=True)
