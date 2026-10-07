@@ -447,16 +447,24 @@ class _ReviewScreenState extends State<ReviewScreen> {
       return;
     }
     final store = context.read<ExpenseStore>();
+    final reviewedAmount = TransferParser.parseVnd(amount.text)!;
+    final reviewedDate = date!;
+    final reviewedDirection = direction;
+    final reviewedCategory = category!;
+    final reviewedSender = sender.text.trim();
+    final reviewedRecipient = recipient.text.trim();
+    final reviewedDescription = description.text.trim();
+    final reviewedReference = reference.text.trim();
     TransferTransaction buildValue({StoredImage? image}) => TransferTransaction(
       id: widget.existing?.id,
-      amount: TransferParser.parseVnd(amount.text)!,
-      date: date!,
-      direction: direction,
-      category: category!,
-      sender: sender.text.trim(),
-      recipient: recipient.text.trim(),
-      description: description.text.trim(),
-      reference: reference.text.trim(),
+      amount: reviewedAmount,
+      date: reviewedDate,
+      direction: reviewedDirection,
+      category: reviewedCategory,
+      sender: reviewedSender,
+      recipient: reviewedRecipient,
+      description: reviewedDescription,
+      reference: reviewedReference,
       rawText: widget.ocr?.text ?? widget.existing?.rawText ?? '',
       imagePath: image?.path ?? widget.existing?.imagePath,
       thumbnailPath: image?.thumbnailPath ?? widget.existing?.thumbnailPath,
@@ -498,8 +506,12 @@ class _ReviewScreenState extends State<ReviewScreen> {
       if (mounted) Navigator.pop(context, true);
     } catch (_) {
       if (cached != null) {
-        await store.images.remove(cached.path);
-        await store.images.remove(cached.thumbnailPath);
+        try {
+          await store.images.remove(cached.path);
+          await store.images.remove(cached.thumbnailPath);
+        } catch (_) {
+          // Preserve the save error even if private cache cleanup also fails.
+        }
       }
       if (mounted) {
         setState(() {
