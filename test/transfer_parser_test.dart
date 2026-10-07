@@ -5,16 +5,37 @@ import 'package:transfer_lens/domain/transfer_parser.dart';
 void main() {
   final parser = TransferParser();
   group('VND amounts', () {
-    for (final value in ['150,000 VND', '150.000 đ', '150 000', '+150000', '150,000.00']) {
-      test('accepts $value', () => expect(TransferParser.parseVnd(value), 150000));
+    for (final value in [
+      '150,000 VND',
+      '150.000 đ',
+      '150 000',
+      '+150000',
+      '150,000.00',
+    ]) {
+      test(
+        'accepts $value',
+        () => expect(TransferParser.parseVnd(value), 150000),
+      );
     }
-    for (final value in ['0', 'abc', '12.34', '150.00', '1,234.567', '1000000000000']) {
-      test('rejects $value', () => expect(TransferParser.parseVnd(value), isNull));
+    for (final value in [
+      '0',
+      'abc',
+      '12.34',
+      '150.00',
+      '1,234.567',
+      '1000000000000',
+    ]) {
+      test(
+        'rejects $value',
+        () => expect(TransferParser.parseVnd(value), isNull),
+      );
     }
   });
 
-  test('extracts a Vietnamese transfer without confusing account, balance or fee', () {
-    final result = parser.parse('''Chuyển khoản thành công
+  test(
+    'extracts a Vietnamese transfer without confusing account, balance or fee',
+    () {
+      final result = parser.parse('''Chuyển khoản thành công
       Số tiền: 150.000 đ
       Người gửi
       NGUYEN VAN AN
@@ -25,16 +46,17 @@ void main() {
       Phí: 2.000 VND
       Số dư: 9.000.000 VND
       Mã giao dịch: FT26123456789''');
-    expect(result.amount, 150000);
-    expect(result.sender, 'NGUYEN VAN AN');
-    expect(result.recipient, 'TRAN THI BINH');
-    expect(result.description, 'thanh toan an trua');
-    expect(result.reference, 'FT26123456789');
-    expect(result.date, DateTime(2026, 10, 7));
-    expect(result.category, ExpenseCategory.food);
-    expect(result.successDetected, isTrue);
-    expect(result.warnings, isEmpty);
-  });
+      expect(result.amount, 150000);
+      expect(result.sender, 'NGUYEN VAN AN');
+      expect(result.recipient, 'TRAN THI BINH');
+      expect(result.description, 'thanh toan an trua');
+      expect(result.reference, 'FT26123456789');
+      expect(result.date, DateTime(2026, 10, 7));
+      expect(result.category, ExpenseCategory.food);
+      expect(result.successDetected, isTrue);
+      expect(result.warnings, isEmpty);
+    },
+  );
 
   test('supports English labels and split amount lines', () {
     final result = parser.parse('''Transfer successful
@@ -52,7 +74,12 @@ void main() {
   });
 
   test('does not guess from account numbers or fee-only screenshots', () {
-    expect(parser.parse('Số tài khoản: 123456789\nPhí: 2000 VND\nSố dư: 150000 VND').amount, isNull);
+    expect(
+      parser
+          .parse('Số tài khoản: 123456789\nPhí: 2000 VND\nSố dư: 150000 VND')
+          .amount,
+      isNull,
+    );
   });
   test('rejects ambiguous unlabeled amounts', () {
     expect(parser.parse('150.000 VND\n250.000 VND').amount, isNull);
@@ -66,24 +93,43 @@ void main() {
     expect(parser.parse('29/02/2024').date, DateTime(2024, 2, 29));
   });
   test('never treats a failed or pending transfer as successful', () {
-    for (final text in ['không thành công', 'Chuyển khoản thất bại', 'unsuccessful transfer', 'pending']) {
+    for (final text in [
+      'không thành công',
+      'Chuyển khoản thất bại',
+      'unsuccessful transfer',
+      'pending',
+    ]) {
       final result = parser.parse(text);
       expect(result.successDetected, isFalse);
       expect(result.failureDetected, isTrue);
     }
   });
-  test('classifies only unambiguous description keywords with word boundaries', () {
-    expect(parser.suggestCategory('học phí tháng 10').$1, ExpenseCategory.study);
-    expect(parser.suggestCategory('Grab đi học').$1, ExpenseCategory.travel);
-    expect(parser.suggestCategory('Mua tai nghe').$1, ExpenseCategory.gear);
-    expect(parser.suggestCategory('Vé xem phim').$1, ExpenseCategory.entertainment);
-    expect(parser.suggestCategory('chuyen tien').$1, isNull);
-    expect(parser.suggestCategory('hoan tien an trua va sach').$1, isNull);
-    expect(parser.suggestCategory('company').$1, isNull);
-    expect(parser.parse('Người nhận: GRAB\nNội dung: Chuyen tien').category, isNull);
-  });
+  test(
+    'classifies only unambiguous description keywords with word boundaries',
+    () {
+      expect(
+        parser.suggestCategory('học phí tháng 10').$1,
+        ExpenseCategory.study,
+      );
+      expect(parser.suggestCategory('Grab đi học').$1, ExpenseCategory.travel);
+      expect(parser.suggestCategory('Mua tai nghe').$1, ExpenseCategory.gear);
+      expect(
+        parser.suggestCategory('Vé xem phim').$1,
+        ExpenseCategory.entertainment,
+      );
+      expect(parser.suggestCategory('chuyen tien').$1, isNull);
+      expect(parser.suggestCategory('hoan tien an trua va sach').$1, isNull);
+      expect(parser.suggestCategory('company').$1, isNull);
+      expect(
+        parser.parse('Người nhận: GRAB\nNội dung: Chuyen tien').category,
+        isNull,
+      );
+    },
+  );
   test('retains multiline description but stops at the next field', () {
-    final result = parser.parse('Nội dung\nthanh toan\nhoc phi\nNgày giao dịch\n07/10/2026');
+    final result = parser.parse(
+      'Nội dung\nthanh toan\nhoc phi\nNgày giao dịch\n07/10/2026',
+    );
     expect(result.description, 'thanh toan hoc phi');
     expect(result.category, ExpenseCategory.study);
   });

@@ -7,7 +7,11 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Transfer Lens</string>
+	<string>TransferLens</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Capture a transfer confirmation for offline expense tracking.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Import a transfer confirmation image for offline text recognition.</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
