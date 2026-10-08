@@ -27,6 +27,9 @@ timeline = []
 seen_steps = set()
 recording_start = None
 recording_end = None
+captured = set()
+screens = ROOT / 'docs/screenshots'
+screens.mkdir(parents=True, exist_ok=True)
 def stop_recording():
     if recording is not None and recording.poll() is None:
         pid = adb('shell', 'pidof', 'screenrecord', capture_output=True, text=True).stdout.strip()
@@ -34,16 +37,12 @@ def stop_recording():
         recording.wait(timeout=15)
 
 def export_screens():
-    screens = ROOT / 'docs/screenshots'
-    screens.mkdir(parents=True, exist_ok=True)
-    names = adb('shell', 'run-as', APP, 'ls', 'app_flutter/demo_screenshots', capture_output=True, text=True).stdout.splitlines()
-    for name in names:
-        data = adb('exec-out', 'run-as', APP, 'cat', f'app_flutter/demo_screenshots/{name}', capture_output=True).stdout
-        (screens / name).write_bytes(data)
-    return len(names)
+    data = adb('exec-out', 'run-as', APP, 'cat', 'app_flutter/demo_screenshots/metrics.txt', capture_output=True).stdout
+    (screens / 'metrics.txt').write_bytes(data)
+    return len(captured) + 1
 
 with LOG.open('w', encoding='utf-8') as log:
-    command = [FLUTTER, 'test', 'integration_test/demo_test.dart', '-d', 'emulator-5554']
+    command = [FLUTTER, 'test', 'integration_test/demo_test.dart', '-d', 'emulator-5554', '--dart-define=CAPTURE_VIA_ADB=true']
     if '--fast' in sys.argv: command.append('--dart-define=FAST_DEMO=true')
     test = subprocess.Popen(command, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT)
     started = time.monotonic()
@@ -57,6 +56,14 @@ with LOG.open('w', encoding='utf-8') as log:
             if label not in seen_steps and recording_start is not None:
                 timeline.append((time.monotonic() - recording_start, label))
                 seen_steps.add(label)
+        for name in re.findall(r'DEMO_CAPTURE: ([a-zA-Z0-9_]+)', content):
+            if name not in captured:
+                data = adb('exec-out', 'screencap', '-p', capture_output=True).stdout
+                if not data.startswith(b'\x89PNG\r\n\x1a\n'):
+                    raise RuntimeError('ADB did not return a PNG screenshot')
+                (screens / f'{name}.png').write_bytes(data)
+                adb('shell', 'run-as', APP, 'touch', f'app_flutter/demo_screenshots/{name}.done')
+                captured.add(name)
         if recording is not None and 'DEMO_RECORDING_END' in content:
             recording_end = time.monotonic()
             stop_recording()

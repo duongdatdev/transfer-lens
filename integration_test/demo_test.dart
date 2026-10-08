@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -18,7 +19,7 @@ import 'package:transfer_lens/ui/widgets/spending_charts.dart';
 import 'package:transfer_lens/ui/widgets/cash_flow_chart.dart';
 
 void main() {
-  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   testWidgets('record the real OCR workflow with fictional confirmations', (
     tester,
   ) async {
@@ -34,6 +35,8 @@ void main() {
         'demo_screenshots',
       ),
     );
+    if (await screenshotDir.exists())
+      await screenshotDir.delete(recursive: true);
     await screenshotDir.create(recursive: true);
     await tester.pumpWidget(
       ChangeNotifierProvider.value(
@@ -44,7 +47,7 @@ void main() {
     await tester.pumpAndSettle();
 
     const fast = bool.fromEnvironment('FAST_DEMO');
-    var converted = false;
+    const externalCapture = bool.fromEnvironment('CAPTURE_VIA_ADB');
     Future<void> hold(int seconds) async {
       await tester.runAsync(
         () => Future<void>.delayed(Duration(seconds: fast ? 1 : seconds)),
@@ -53,13 +56,21 @@ void main() {
     }
 
     Future<void> capture(String name) async {
-      if (!converted) {
-        await binding.convertFlutterSurfaceToImage();
-        converted = true;
-      }
+      if (!externalCapture) return;
       await tester.pumpAndSettle();
-      await File(p.join(screenshotDir.path, '$name.png'))
-          .writeAsBytes(await binding.takeScreenshot(name));
+      debugPrint('DEMO_CAPTURE: $name');
+      final acknowledgement = File(p.join(screenshotDir.path, '$name.done'));
+      await tester.runAsync(() async {
+        final deadline = DateTime.now().add(const Duration(seconds: 30));
+        while (!await acknowledgement.exists()) {
+          if (DateTime.now().isAfter(deadline)) {
+            throw TimeoutException(
+              'The host screenshot recorder did not respond',
+            );
+          }
+          await Future<void>.delayed(const Duration(milliseconds: 100));
+        }
+      });
     }
 
     Future<void> reveal(Finder finder) async {
