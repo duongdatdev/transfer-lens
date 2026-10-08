@@ -7,9 +7,9 @@
 ## Deliverables
 
 - [Public repository](https://github.com/duongdatdev/transfer-lens)
-- [Signed release APK](https://github.com/duongdatdev/transfer-lens/releases/download/v1.0.0/app-release.apk)
-- [Demo video](https://github.com/duongdatdev/transfer-lens/releases/download/v1.0.0/transfer-lens-demo.mp4)
-- [Technical report PDF](https://github.com/duongdatdev/transfer-lens/releases/download/v1.0.0/transfer-lens-report.pdf)
+- [Signed release APK](https://github.com/duongdatdev/transfer-lens/releases/download/v1.1.0/app-release.apk)
+- [Demo video](https://github.com/duongdatdev/transfer-lens/releases/download/v1.1.0/transfer-lens-demo.mp4)
+- [Technical report PDF](https://github.com/duongdatdev/transfer-lens/releases/download/v1.1.0/transfer-lens-report.pdf)
 
 ## Scope adaptation
 

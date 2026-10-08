@@ -16,7 +16,7 @@ flowchart TD
   H --> I[SQLite transaction repository]
   H --> J[Private image and thumbnail storage]
   I --> K[History and monthly summaries]
-  K --> L[CustomPainter donut and weekly bars]
+  K --> L[CustomPainter donut, weekly bars and daily trend]
 ```
 
 ## Module boundaries
@@ -50,8 +50,10 @@ flowchart TD
 
 SQLite schema version 1 stores amount, date, direction, category, parties, description,
 reference, raw OCR text, recognition duration and private image paths. Monetary amounts
-are integers to avoid floating-point rounding. Charts aggregate expenses only; income
-is shown separately. Monthly and weekly navigation use local calendar days.
+are integers to avoid floating-point rounding. Donut and weekly bars aggregate expenses
+only. CashFlowMonth aggregates separate income/expense arrays by calendar day, with
+zero-filled days and leap-year support. The daily chart uses both directions and shows
+monthly income minus expenses, not a bank account balance.
 
 New image files are copied only on save; thumbnails are resized in a background isolate.
 If the database write fails, the new cache files are removed. Deletion removes the database
@@ -76,3 +78,22 @@ The release manifest explicitly removes dependency-added network, microphone and
 broad storage permissions. A dedicated signed release smoke entry point verifies
 that ML Kit still recognizes the bundled sample under this configuration. R8 rules
 preserve the no-argument component registrar constructors required by ML Kit.
+
+## Animated daily cash flow
+
+`CashFlowChart` owns its AnimationController and selected day as local state.
+An AnimatedBuilder inside a RepaintBoundary redraws the plot without rebuilding
+the dashboard every frame. First display, month changes and replay reveal lines
+from left to right over 900 ms. Same-month record edits/removals interpolate from
+the current displayed values over 500 ms, including interrupted transitions.
+The controller is disposed on unmount. Reduced motion displays final values
+immediately and disables replay.
+
+Reveal uses `PathMetric.extractPath` to advance by path length, so spikes remain
+visible during the animation even when all transactions occur near the start
+of a month. Data-value transitions use an ease-out curve.
+
+CustomPainter draws grid lines, expense area/solid line, income dashed line and
+selected-day markers. Tap the plot to choose the nearest calendar day or use the
+labeled previous/next day buttons; visible VND values and a semantic summary
+provide a screen-reader alternative. Changing theme does not restart the animation.

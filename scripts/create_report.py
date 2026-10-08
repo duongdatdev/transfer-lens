@@ -30,7 +30,7 @@ CW = WIDTH - MARGIN * 2
 publication_file = ROOT / 'docs/publication.json'
 publication = json.loads(publication_file.read_text('utf-8')) if publication_file.exists() else {'published': False}
 repo_url = publication.get('repository', 'https://github.com/duongdatdev/transfer-lens')
-release_url = publication.get('release', repo_url + '/releases/tag/v1.0.0')
+release_url = publication.get('release', repo_url + '/releases/tag/v1.1.0')
 metrics_file = ROOT / 'docs/screenshots/metrics.txt'
 metrics = metrics_file.read_text('utf-8') if metrics_file.exists() else 'See on-screen measured OCR durations in the demonstration.'
 style = ParagraphStyle('Body', fontName='Arial', fontSize=9.5, leading=14, textColor=INK)
@@ -77,9 +77,9 @@ def table(rows, widths, y):
 
 y = start_page(1, 'Short technical report', 'Official template: general information, feature checklist, architecture, empirical evidence and challenges.')
 y = section('1. GENERAL INFORMATION &amp; DELIVERABLE LINKS', y)
-y = paragraph('<b>Course:</b> Cross-Platform Mobile App Development (VKU)<br/><b>Mini-Project Title:</b> Mini-Project 3 - OCR Expense Tracker &amp; Transfer Parser<br/><b>Student:</b> Dương Bảo Đạt | <b>Student ID:</b> 23IT046<br/><b>Team:</b> Individual | <b>Role:</b> Full-stack mobile developer | <b>Contribution:</b> 100%<br/><b>Submission date:</b> 07/10/2026', MARGIN, y)
+y = paragraph('<b>Course:</b> Cross-Platform Mobile App Development (VKU)<br/><b>Mini-Project Title:</b> Mini-Project 3 - OCR Expense Tracker &amp; Transfer Parser<br/><b>Student:</b> Dương Bảo Đạt | <b>Student ID:</b> 23IT046<br/><b>Team:</b> Individual | <b>Role:</b> Full-stack mobile developer | <b>Contribution:</b> 100%<br/><b>Submission date:</b> 09/10/2026 | <b>Version:</b> 1.1.0', MARGIN, y)
 if publication.get('published'):
-    y = paragraph(f'<b>GitHub:</b> <link href="{repo_url}" color="#176B58">{repo_url}</link><br/><b>APK + video:</b> <link href="{release_url}" color="#176B58">GitHub Release v1.0.0 - download all deliverables</link><br/><b>PDF:</b> transfer-lens-report.pdf (this report)', MARGIN, y)
+    y = paragraph(f'<b>GitHub:</b> <link href="{repo_url}" color="#176B58">{repo_url}</link><br/><b>APK + video:</b> <link href="{release_url}" color="#176B58">GitHub Release v1.1.0 - download all deliverables</link><br/><b>PDF:</b> transfer-lens-report.pdf (this report)', MARGIN, y)
 else:
     y = paragraph('<b>Local deliverables:</b> app-release.apk; transfer-lens-demo.mp4; transfer-lens-report.pdf.<br/><b>Publication status:</b> GitHub repository creation returned HTTP 500 during preparation. Source and release assets are ready locally; public URLs are pending publication.', MARGIN, y)
 y = paragraph('<b>Adapted scenario:</b> Instead of paper receipts, the user imports a completed bank-transfer image. The parser extracts amount, date, sender/recipient and description. A keyword rule suggests a category; unknown descriptions require manual selection. This scope change follows the student request and is documented for instructor review.', MARGIN, y)
@@ -91,9 +91,9 @@ y = table([
     ['Regex heuristics', 'Validated', 'VND, calendar date, explicit parties, description/reference; ambiguity and failure warnings.'],
     ['Category + review', 'Validated', 'Five mapped categories plus Other; editable fields, confirmation and duplicate warning.'],
     ['Provider + SQLite CRUD', 'Validated', 'Local records survive database reopen; full-size images and resized thumbnails cached privately.'],
-    ['Canvas visualizations', 'Validated', 'Animated, interactive CustomPainter donut and weekly bars; no chart package.'],
+    ['Canvas visualizations', 'Validated', 'Animated donut, weekly bars and daily income/expense trend; tap inspection and replay.'],
     ['Material 3 + accessibility', 'Validated', 'Light/dark/system, responsive layout, large-text and reduced-motion widget checks.'],
-    ['Release + report', 'Prepared', 'Signed APK, native walkthrough video, four-page report; online publication status shown above.'],
+    ['Release + report', 'Published', 'Signed APK, 2-3 minute native walkthrough, four-page report with regex table.'],
 ], [132, 67, CW-199], y)
 if y < 45: raise RuntimeError('Page 1 overflow')
 c.showPage()
@@ -112,18 +112,31 @@ for i, (label, detail) in enumerate(steps):
         c.setFont('ArialBold', 14)
         c.drawString(x+box_width+1, y-38, '>')
 y -= 80
-y = paragraph('<b>Approved review → Provider ExpenseStore → SQLite repository + private image storage → history + CustomPainter charts.</b><br/>The app never initiates a transfer. Direction defaults to expense and remains editable. Income is recorded separately and excluded from spending charts.', MARGIN, y)
+for i, (label, detail) in enumerate([('CANVAS', 'Donut / bars / trend'), ('DISPLAY', 'History + totals'), ('SHARED STATE', 'Provider'), ('LOCAL DATA', 'SQLite + images')]):
+    x = MARGIN+i*(box_width+10)
+    c.setFillColor(PALE)
+    c.roundRect(x, y-62, box_width, 62, 10, fill=1, stroke=0)
+    paragraph(f'<b>{label}</b><br/>{detail}', x+10, y-12, box_width-20, small)
+    if i < 3:
+        c.setFillColor(GREEN)
+        c.setFont('ArialBold', 14)
+        c.drawString(x+box_width+1, y-38, '<')
+c.setStrokeColor(GREEN)
+c.line(WIDTH-MARGIN-box_width/2, y+18, WIDTH-MARGIN-box_width/2, y+3)
+c.line(WIDTH-MARGIN-box_width/2, y+3, WIDTH-MARGIN-box_width/2-3, y+8)
+c.line(WIDTH-MARGIN-box_width/2, y+3, WIDTH-MARGIN-box_width/2+3, y+8)
+y -= 76
+y = paragraph('<b>Approved review → Provider ExpenseStore → SQLite repository + private image storage → history + CustomPainter charts.</b><br/>Direction defaults to expense and remains editable. The donut/bars exclude income; the daily trend separates income and expenses. It shows recorded cash flow, not the bank balance.', MARGIN, y)
 y = table([
     ['Directory', 'Responsibility'],
-    ['lib/domain', 'Immutable transaction model; integer VND normalization; label/date/status rules; accent-insensitive description keywords.'],
-    ['lib/data + lib/state', 'Repository abstraction, schema constraints/indexes, parameterized CRUD, Provider state, duplicate warning and persistent theme.'],
-    ['lib/services', 'Native recognizer lifetime and visual reading order; private original images; thumbnail resizing in a background isolate.'],
-    ['lib/ui + widgets', 'Import, camera, review, history and settings; interactive donut/bar painters with reduced-motion support.'],
-    ['test + integration_test', 'Parser edge cases, real SQLite reopen, adaptive UI, native OCR and end-to-end review/cache/delete flow.'],
+    ['lib/domain', 'Transaction model, VND/date/status rules, description keywords, calendar-day cash-flow aggregation.'],
+    ['lib/data + state', 'SQLite repository and constraints; Provider transactions, duplicate warning and persistent theme.'],
+    ['lib/services', 'Native OCR lifetime; private originals; isolate-based thumbnail resizing.'],
+    ['lib/ui + widgets', 'Import/review/history; donut, bars and trend painters; localized animation and reduced motion.'],
 ], [130, CW-130], y)
-y = paragraph('<b>Failure handling:</b> Missing/ambiguous fields remain editable. Database writes happen after review and image caching. If a write fails, new cache files are cleaned up. Delete the row before cleaning its images. Camera lifecycle and OCR resources are disposed. Android backups are disabled; local files are not additionally encrypted.', MARGIN, y)
+y = paragraph('<b>Failure handling:</b> Uncertain fields remain editable. Review and image caching precede database writes; failed writes clean new images. Deletion removes the row before files. Camera/OCR resources are disposed; Android backup is disabled.', MARGIN, y)
 y = section('Measured verification', y)
-y = paragraph('<b>Toolchain:</b> Flutter 3.47.5, Dart 3.13.4, Android SDK 36, Java 21. Android API 24+ is the release target. iOS 15.5+ is configured but untested on Windows.<br/><b>Checks:</b> Formatting and analyzer; 31 unit/widget tests; native Android review/cache/CRUD integration. A signed optimized release also recognized the sample without Internet permission (2,595 ms).<br/><b>OCR cold run:</b> 4,488 ms on the emulator in the initial integration test. Further demo observations are below. These are observations, not a physical-device performance claim.', MARGIN, y)
+y = paragraph('<b>Toolchain:</b> Flutter 3.47.5, Dart 3.13.4, SDK 36, Java 21; Android API 24+.<br/><b>Checks:</b> Analyzer; 41 unit/widget tests; native Android walkthrough. Trend tests cover leap years, month boundaries, totals, interrupted transitions, replay, 200% text and reduced motion.<br/><b>OCR:</b> v1.0.0 signed release: 2,595 ms offline; initial emulator cold run: 4,488 ms. Latest demo measurements follow; these are not physical-device latency claims.', MARGIN, y)
 y = paragraph(escape(metrics).replace('\n', '<br/>'), MARGIN+12, y, CW-24, small)
 if y < 45: raise RuntimeError('Page 2 overflow')
 c.showPage()
@@ -133,8 +146,8 @@ y = section('4. EMPIRICAL EVIDENCE &amp; SCREENSHOTS', y)
 shots = [
     ('03_ocr_review.png', 'A. Native OCR review', 'The imported image, measured OCR duration and editable amount appear before saving.'),
     ('06_manual_category.png', 'B. Manual classification', 'A generic transfer description has no confident keyword match, so a category must be selected.'),
-    ('07_donut.png', 'C. Canvas analytics', 'Saved expenses feed the category donut. Selected categories expose exact VND amounts.'),
-    ('10_dark_history.png', 'D. Persistent history', 'Searchable records with thumbnails, category/date labels and amounts; Material 3 dark mode.'),
+    ('12_cash_flow_light.png', 'C. Animated daily trend', 'Real saved records form income (dashed) and expense (solid) series. Select a date or replay the reveal.'),
+    ('13_cash_flow_dark.png', 'D. Dark mode + updates', 'Edited amounts change the trend and monthly net. Theme changes retain the same financial data.'),
 ]
 cell_width = (CW-20)/2
 for i, (filename, title, annotation) in enumerate(shots):
@@ -152,19 +165,27 @@ c.showPage()
 
 y = start_page(4, 'Challenges & resolutions', 'Design decisions, validation limits and the practical submission handoff.')
 y = section('5. TECHNICAL CHALLENGES &amp; RESOLUTIONS', y)
-y = paragraph('<b>Challenge 1 - Financial numbers and banking layouts.</b><br/>A confirmation can contain a balance, fee, reference and account number, all near the real amount. The parser scores explicit amount labels above currency-only values and excludes unrelated fields. It validates calendar dates, treats conflicting candidates as unresolved, and reads only explicitly labeled parties. Names and missing data remain editable. Classification uses only description keywords with phrase boundaries, avoiding accidental matches inside names or unrelated words.', MARGIN, y)
-y = paragraph('<b>Challenge 2 - Native release build and adaptive UI.</b><br/>Windows Kotlin caches failed across different drives; incremental compilation was disabled. R8 required narrowly scoped rules for unused ML Kit scripts and explicit preservation of reflectively created component-registrar constructors. A signed release smoke test confirmed OCR without Internet permission after the fix. Large-text tests found overflowing summary labels and chart centers; flexible text layout resolved the failures.', MARGIN, y)
+y = paragraph('<b>Financial ambiguity:</b> Explicit amount labels outrank currency-only values; balance, fee, account and reference fields are excluded. Conflicting amounts or invalid dates require review. Only explicitly labeled parties are extracted.<br/><b>Animation and builds:</b> Daily values interpolate from the current frame during rapid updates. Calendar indexes handle leap years. Flexible legends support 200% text. R8 preserves native ML Kit registrar constructors; Windows Kotlin incremental caching is disabled across drives.', MARGIN, y)
+y = section('OCR regex and heuristic table', y)
+y = table([
+    ['Field', 'Rule / regex after normalization', 'Fallback'],
+    ['VND amount', r'\d{1,3}(?:[.,]\d{3})+ or plain digits; prioritize so tien / amount labels.', 'Reject malformed grouping; manual amount.'],
+    ['Date', r'(\d{1,2})[/.-](\d{1,2})[/.-](\d{4}); validate calendar + 2000-2100.', 'Invalid/conflicting dates: date picker.'],
+    ['Parties / content', 'Label prefixes: nguoi gui, nguoi nhan, noi dung; read adjacent lines.', 'Missing fields remain editable.'],
+    ['Category', 'Accent-free whole phrases: an trua, hoc phi, taxi, mua sam, xem phim.', 'No unique match: manual category.'],
+    ['Completion', 'thanh cong | successful | completed; failed/pending override success.', 'Always require human confirmation.'],
+], [65, 278, CW-343], y)
 y = section('Acceptance scope and remaining checks', y)
-y = paragraph('<b>Validated:</b> Android native OCR on fictional confirmations, reviewed saving, SQLite persistence, image/thumbnail lifecycle, category fallback, duplicate detection, canvas selection, responsive light/dark layouts and release signing.<br/><b>Physical-device follow-up:</b> Verify camera flash/focus, photo-picker/crop flow, bank-specific image accuracy and latency on the target phone. Emulator OCR measurements do not establish the assignment\'s sub-100ms target.<br/><b>iOS:</b> Source permissions, Podfile and deployment target are prepared; a macOS/Xcode device build is still required.<br/><b>Privacy:</b> No account, cloud OCR or bank integration. Images, raw text and transactions remain local. This app is a personal record and does not prove that money was transferred.', MARGIN, y)
+y = paragraph('<b>Physical-device follow-up:</b> Camera flash/focus, gallery/crop and real-bank image accuracy still require a target phone. The sub-100ms target has not been demonstrated. iOS requires macOS/Xcode validation.<br/><b>Privacy:</b> No cloud OCR or bank API. SQLite, images and raw text stay local; backups are disabled, with no additional file encryption. Records are user-confirmed and do not prove payment.', MARGIN, y)
 y = section('Build and demonstrate', y)
-y = paragraph('<b>Setup:</b> flutter pub get; flutter run -d &lt;android-device&gt;.<br/><b>Quality:</b> flutter analyze; flutter test; flutter test integration_test/app_test.dart -d &lt;android-device&gt;.<br/><b>Signed release:</b> Set private android/key.properties, then flutter build apk --release.<br/><b>Video:</b> Actual Flutter screens and real ML Kit processing, automated using integration_test with fictional data. The source includes a reproducible walkthrough and recording script.', MARGIN, y)
+y = paragraph('<b>Setup:</b> flutter pub get; flutter run -d &lt;android-device&gt;.<br/><b>Quality:</b> flutter analyze; flutter test. Native tests: integration_test/app_test.dart and demo_test.dart.<br/><b>Release:</b> Set private android/key.properties; flutter build apk --release.<br/><b>Video:</b> Actual native screens, real ML Kit and fictional data; reproducible integration-test recording.', MARGIN, y)
 y = section('References', y)
 for label, url in [
     ('Google ML Kit: bundled Android text-recognition model', 'https://developers.google.com/ml-kit/vision/text-recognition/v2/android'),
     ('Flutter ML Kit plugin: mobile platforms and model setup', 'https://pub.dev/packages/google_mlkit_text_recognition'),
     ('Flutter CustomPainter: canvas rendering API', 'https://api.flutter.dev/flutter/rendering/CustomPainter-class.html'),
-    ('Image Cropper: native configuration', 'https://pub.dev/packages/image_cropper'),
     ('Original report structure: supplied Mini-Project-3-Report-Template.md', None),
+    ('Course slides: Week 7 Part 1 (rubric p.42); Week 8 Part 2 (canvas pp.30-34, checklist p.43)', None),
 ]:
     text = f'<link href="{url}" color="#176B58">{escape(label)}</link>' if url else escape(label)
     y = paragraph(text, MARGIN, y, kind=small)

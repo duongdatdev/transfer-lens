@@ -11,9 +11,12 @@ fictional data, and each sample is processed by the same native ML Kit recognize
 4. **0:55-1:15** - Show the `an trua` keyword suggestion. Confirm details and save.
 5. **1:15-1:40** - Import **Chuyển tiền**. No category keyword is present. Select **Di chuyển**
    manually, confirm, and save.
-6. **1:40-2:00** - Tap a donut category and a weekly bar/day. Explain expenses versus income.
-7. **2:00-2:20** - Search history, open a transaction, edit it, and show delete confirmation.
-8. **2:20-2:35** - Toggle dark mode; relaunch the app to demonstrate local persistence.
+6. **1:40-2:00** - Import **Tiền sinh hoạt**, select **Khoản thu** and **Khác**. Inspect
+   the donut and weekly bars, which include expenses only.
+7. **2:00-2:20** - Show **Biến động thu / chi**. Replay the animated lines and inspect
+   03/10/2026: income 1,200,000 VND. Explain solid expenses versus dashed income.
+8. **2:20-2:50** - Open a transaction, edit its amount, and switch to dark mode.
+   The daily chart and monthly net update from the saved records.
 
 For a physical-device recording, enable airplane mode before importing to demonstrate
 offline recognition. Never use real bank details in a public video or repository.

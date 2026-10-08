@@ -11,6 +11,7 @@ Flutter + on-device Google ML Kit OCR + a Dart heuristic parser + SQLite + anima
 <p>
   <img src="docs/screenshots/03_ocr_review.png" width="230" alt="Review actual OCR results before saving" />
   <img src="docs/screenshots/07_donut.png" width="230" alt="Interactive expense distribution on a custom canvas" />
+  <img src="docs/screenshots/12_cash_flow_light.png" width="230" alt="Animated daily income and expense trend" />
   <img src="docs/screenshots/10_dark_history.png" width="230" alt="Searchable transaction history in dark mode" />
 </p>
 
@@ -19,14 +20,15 @@ Flutter + on-device Google ML Kit OCR + a Dart heuristic parser + SQLite + anima
 | Deliverable | Link |
 | --- | --- |
 | Public source | [GitHub repository](https://github.com/duongdatdev/transfer-lens) |
-| Signed Android APK | [Download app-release.apk](https://github.com/duongdatdev/transfer-lens/releases/download/v1.0.0/app-release.apk) |
-| 2-3 minute demonstration | [Download demo video](https://github.com/duongdatdev/transfer-lens/releases/download/v1.0.0/transfer-lens-demo.mp4) |
-| 2-4 page report | [Download technical PDF](https://github.com/duongdatdev/transfer-lens/releases/download/v1.0.0/transfer-lens-report.pdf) |
+| Signed Android APK | [Download app-release.apk](https://github.com/duongdatdev/transfer-lens/releases/download/v1.1.0/app-release.apk) |
+| 2-3 minute demonstration | [Download demo video](https://github.com/duongdatdev/transfer-lens/releases/download/v1.1.0/transfer-lens-demo.mp4) |
+| 2-4 page report | [Download technical PDF](https://github.com/duongdatdev/transfer-lens/releases/download/v1.1.0/transfer-lens-report.pdf) |
 
 The paper-receipt scenario has been adapted to user-provided **transfer confirmation
 images**. Sender/recipient replace merchant names, and transfer descriptions drive
 category suggestions. Optional camera capture remains implemented. See
-[scope mapping](docs/submission.md) and [architecture](docs/architecture.md).
+[scope mapping](docs/submission.md), [architecture](docs/architecture.md) and
+[Week 7-8 course alignment](docs/course-alignment.md).
 
 ## Features
 
@@ -41,8 +43,11 @@ category suggestions. Optional camera capture remains implemented. See
 - Persistent CRUD, private confirmation images and resized thumbnails.
 - Animated monthly category donut and weekly spending bars, drawn directly on canvas;
   touch a segment/day or use labeled selection controls to inspect values.
+- Animated daily income/expense line and area chart, with replay, date inspection and
+  smooth live updates when amounts change. Solid/dashed lines distinguish the series;
+  monthly net is recorded income minus expenses, not a bank balance.
 - Search/filter history, navigate months/weeks, Material 3 light/dark/system themes.
-- Three fictional sample images run through **real native OCR**, with measured latency.
+- Four fictional sample images run through **real native OCR**, with measured latency.
 
 ## Run locally
 
@@ -101,7 +106,8 @@ from this Windows environment.
 6. Inspect spending charts or search/filter **Giao dịch**; open a record to edit/delete it.
 
 For a quick demonstration, choose **Bữa trưa**, **Học phí** or **Chuyển tiền** on the
-import screen. Samples use fictional names/references, not real banking credentials.
+import screen; **Tiền sinh hoạt** also demonstrates incoming transfers (select **Khoản thu**).
+Samples use fictional names/references, not real banking credentials.
 
 ## Validation
 
@@ -139,6 +145,9 @@ The recording script uses a dedicated `emulator-5554` and an isolated demo datab
 It captures actual screenshots while the integration test is still installed. Sample/report
 generation uses the Windows Arial font. A condensed QA run is available with
 `python scripts/record_demo.py --fast`; use the normal run for the submission video.
+Screenshots are taken through ADB without replacing Flutter's render surface, so
+the native screen recording retains live animations. Running the demo integration
+test directly skips screenshot export; use the Python recorder to generate artifacts.
 
 ## Project structure
 
@@ -149,7 +158,7 @@ lib/
   services/     native OCR and private image/thumbnail storage
   state/        Provider ExpenseStore and persisted theme
   ui/           dashboard, history, import, camera, editable review
-    widgets/    CustomPainter donut and weekly bars
+    widgets/    CustomPainter donut, weekly bars and daily cash-flow trend
 assets/samples/ fictional OCR images
 test/           parser, SQLite and widget tests
 integration_test/ native end-to-end validation
