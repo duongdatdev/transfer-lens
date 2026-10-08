@@ -207,6 +207,12 @@ void main() {
       'DEMO_STEP: Biến động thu/chi: AnimationController vẽ hai đường theo ngày.',
     );
     await tester.tap(find.byKey(const ValueKey('replay-cash-flow')));
+    for (var i = 0; i < 60; i++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 16)),
+      );
+      await tester.pump(const Duration(milliseconds: 16));
+    }
     await tester.pumpAndSettle();
     final plot = find.byKey(const ValueKey('cash-flow-plot'));
     final rect = tester.getRect(plot);

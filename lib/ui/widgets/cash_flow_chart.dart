@@ -148,7 +148,7 @@ class _CashFlowChartState extends State<CashFlowChart>
                       painter: CashFlowPainter(
                         income: _interpolate(_fromIncome, _toIncome),
                         expenses: _interpolate(_fromExpenses, _toExpenses),
-                        reveal: _reveal ? _progress : 1,
+                        reveal: _reveal ? _controller.value : 1,
                         selected: _selected,
                         incomeColor: scheme.primary,
                         expenseColor: scheme.error,
@@ -311,9 +311,7 @@ class CashFlowPainter extends CustomPainter {
       gridPaint..strokeWidth = 2,
     );
     canvas.save();
-    canvas.clipRect(
-      Rect.fromLTRB(0, 0, plot.left + plot.width * reveal + 5, size.height),
-    );
+    canvas.clipRect(Offset.zero & size);
 
     void drawSeries(List<double> values, Color color, bool dashed) {
       final path = Path();
@@ -325,9 +323,14 @@ class CashFlowPainter extends CustomPainter {
           path.lineTo(p.dx, p.dy);
         }
       }
+      final metric = path.computeMetrics().first;
+      final length = metric.length * reveal;
+      if (length <= 0) return;
+      final visiblePath = metric.extractPath(0, length);
+      final end = metric.getTangentForOffset(length)!.position;
       if (!dashed) {
-        final fill = Path.from(path)
-          ..lineTo(plot.right, plot.bottom)
+        final fill = Path.from(visiblePath)
+          ..lineTo(end.dx, plot.bottom)
           ..lineTo(plot.left, plot.bottom)
           ..close();
         canvas.drawPath(
@@ -350,7 +353,7 @@ class CashFlowPainter extends CustomPainter {
         ..strokeJoin = StrokeJoin.round
         ..strokeCap = StrokeCap.round;
       if (dashed) {
-        for (final metric in path.computeMetrics()) {
+        for (final metric in visiblePath.computeMetrics()) {
           for (var offset = 0.0; offset < metric.length; offset += 12) {
             canvas.drawPath(
               metric.extractPath(offset, math.min(offset + 6, metric.length)),
@@ -359,11 +362,12 @@ class CashFlowPainter extends CustomPainter {
           }
         }
       } else {
-        canvas.drawPath(path, paint);
+        canvas.drawPath(visiblePath, paint);
       }
       for (var i = 0; i < values.length; i++) {
         if (values[i] <= 0 && i != selected) continue;
         final p = point(i, values[i]);
+        if (p.dx > end.dx + .1) continue;
         canvas.drawCircle(
           p,
           i == selected ? 5 : 3,

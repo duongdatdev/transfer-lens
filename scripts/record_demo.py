@@ -5,6 +5,7 @@ import subprocess
 import time
 import sys
 import re
+import imageio_ffmpeg
 
 sys.stdout.reconfigure(encoding='utf-8')
 
@@ -25,6 +26,7 @@ recording = None
 timeline = []
 seen_steps = set()
 recording_start = None
+recording_end = None
 def stop_recording():
     if recording is not None and recording.poll() is None:
         pid = adb('shell', 'pidof', 'screenrecord', capture_output=True, text=True).stdout.strip()
@@ -56,13 +58,14 @@ with LOG.open('w', encoding='utf-8') as log:
                 timeline.append((time.monotonic() - recording_start, label))
                 seen_steps.add(label)
         if recording is not None and 'DEMO_RECORDING_END' in content:
+            recording_end = time.monotonic()
             stop_recording()
             exported = export_screens()
             break
         if time.monotonic() - started > 900:
             test.terminate()
             raise TimeoutError('Demo test exceeded 15 minutes')
-        time.sleep(1)
+        time.sleep(0.1)
     code = test.wait(timeout=30)
 stop_recording()
 if code:
@@ -70,11 +73,19 @@ if code:
     raise SystemExit(code)
 if recording is None:
     raise RuntimeError('The test never signaled recording start')
-adb('pull', '/sdcard/transfer-lens-demo.mp4', str(OUT / 'transfer-lens-demo-raw.mp4'), stdout=subprocess.DEVNULL)
+raw = OUT / 'transfer-lens-demo-raw.mp4'
+adb('pull', '/sdcard/transfer-lens-demo.mp4', str(raw), stdout=subprocess.DEVNULL)
+probe = subprocess.run([imageio_ffmpeg.get_ffmpeg_exe(), '-i', str(raw)], capture_output=True, text=True)
+duration_match = re.search(r'Duration: (\d+):(\d+):(\d+\.\d+)', probe.stderr)
+if not duration_match: raise RuntimeError('Cannot read the captured video duration')
+hours, minutes, seconds = duration_match.groups()
+duration = int(hours) * 3600 + int(minutes) * 60 + float(seconds)
+startup_delay = max(0, recording_end - recording_start - duration)
+timeline = [(max(0, start - startup_delay), label) for start, label in timeline]
 def timestamp(seconds):
     millis = max(0, int(seconds * 1000))
     return f'{millis // 3600000:02}:{millis // 60000 % 60:02}:{millis // 1000 % 60:02},{millis % 1000:03}'
-end_time = time.monotonic() - recording_start - 20
+end_time = duration
 segments = []
 for i, (start, label) in enumerate(timeline):
     end = timeline[i+1][0] if i+1 < len(timeline) else end_time
