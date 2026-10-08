@@ -10,7 +10,7 @@ BOLD = FONT.with_name('arialbd.ttf') if FONT.with_name('arialbd.ttf').exists() e
 def font(size, bold=False):
     return ImageFont.truetype(str(BOLD if bold else FONT), size)
 
-def sample(name, amount, recipient, description, ref):
+def sample(name, amount, recipient, description, ref, date='07/10/2026', sender='NGUYEN VAN AN'):
     image = Image.new('RGB', (1080, 1740), '#f5f7f4')
     draw = ImageDraw.Draw(image)
     draw.rounded_rectangle((48, 48, 1032, 1692), 48, fill='white')
@@ -19,7 +19,7 @@ def sample(name, amount, recipient, description, ref):
     draw.line((505, 252, 533, 280, 578, 224), fill='#176b58', width=12)
     draw.text((540, 376), 'Chuyển khoản thành công', anchor='mm', fill='#172c25', font=font(49, True))
     draw.text((540, 484), amount + ' VND', anchor='mm', fill='#176b58', font=font(74, True))
-    rows = [('Số tiền', amount + ' VND'), ('Người gửi', 'NGUYEN VAN AN'), ('Người nhận', recipient), ('Nội dung', description), ('Ngày giao dịch', '07/10/2026 12:30'), ('Mã giao dịch', ref), ('Phí giao dịch', '0 VND')]
+    rows = [('Số tiền', amount + ' VND'), ('Người gửi', sender), ('Người nhận', recipient), ('Nội dung', description), ('Ngày giao dịch', date + ' 12:30'), ('Mã giao dịch', ref), ('Phí giao dịch', '0 VND')]
     y = 586
     for label, value in rows:
         draw.text((96, y), label, fill='#55675e', font=font(31))
@@ -32,8 +32,9 @@ def sample(name, amount, recipient, description, ref):
     image.save(target)
 
 sample('food', '150.000', 'TRAN THI BINH', 'Thanh toan an trua', 'DEMO-FOOD-001')
-sample('study', '450,000', 'TRUNG TAM HOC TAP', 'Dong hoc phi thang 10', 'DEMO-STUDY-002')
-sample('unknown', '200.000', 'LE MINH HOA', 'Chuyen tien', 'DEMO-OTHER-003')
+sample('study', '450,000', 'TRUNG TAM HOC TAP', 'Dong hoc phi thang 10', 'DEMO-STUDY-002', date='05/10/2026')
+sample('unknown', '200.000', 'LE MINH HOA', 'Chuyen tien', 'DEMO-OTHER-003', date='09/10/2026')
+sample('income', '1.200.000', 'NGUYEN VAN AN', 'Tien sinh hoat', 'DEMO-INCOME-004', date='03/10/2026', sender='NGUYEN THI LAN')
 
 icon = Image.new('RGB', (1024, 1024), '#176b58')
 draw = ImageDraw.Draw(icon)
@@ -45,4 +46,4 @@ draw.line((624, 766, 694, 836, 804, 704), fill='#176b58', width=32)
 for bucket, size in [('mdpi', 48), ('hdpi', 72), ('xhdpi', 96), ('xxhdpi', 144), ('xxxhdpi', 192)]:
     icon.resize((size, size), Image.Resampling.LANCZOS).save(ROOT / f'android/app/src/main/res/mipmap-{bucket}/ic_launcher.png')
 icon.save(ROOT / 'assets/app_icon.png')
-print('Generated three fictional OCR fixtures and launcher artwork.')
+print('Generated four fictional OCR fixtures and launcher artwork.')

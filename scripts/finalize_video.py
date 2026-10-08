@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'output/demo'
 video = OUT / 'transfer-lens-demo.mp4'
 raw = OUT / 'transfer-lens-demo-raw.mp4'
-if video.exists() and not raw.exists(): video.replace(raw)
+if not raw.exists(): raise FileNotFoundError('Run scripts/record_demo.py to capture a raw walkthrough first.')
 subtitle = (OUT / 'demo.srt').read_text('utf-8')
 header = '''[Script Info]
 ScriptType: v4.00+

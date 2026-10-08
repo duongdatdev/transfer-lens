@@ -16,6 +16,7 @@ APP = 'dev.duongdat.transfer_lens'
 OUT = ROOT / 'output/demo'
 OUT.mkdir(parents=True, exist_ok=True)
 LOG = ROOT / 'tmp/demo-test.log'
+LOG.parent.mkdir(parents=True, exist_ok=True)
 
 def adb(*args, **kwargs):
     return subprocess.run([ADB, '-s', 'emulator-5554', *args], check=True, **kwargs)
@@ -69,7 +70,7 @@ if code:
     raise SystemExit(code)
 if recording is None:
     raise RuntimeError('The test never signaled recording start')
-adb('pull', '/sdcard/transfer-lens-demo.mp4', str(OUT / 'transfer-lens-demo.mp4'), stdout=subprocess.DEVNULL)
+adb('pull', '/sdcard/transfer-lens-demo.mp4', str(OUT / 'transfer-lens-demo-raw.mp4'), stdout=subprocess.DEVNULL)
 def timestamp(seconds):
     millis = max(0, int(seconds * 1000))
     return f'{millis // 3600000:02}:{millis // 60000 % 60:02}:{millis // 1000 % 60:02},{millis % 1000:03}'

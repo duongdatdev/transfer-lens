@@ -129,6 +129,12 @@ class _ImportScreenState extends State<ImportScreen> {
                 '200.000 ₫ · Tự chọn danh mục',
                 Icons.category_outlined,
               ),
+              (
+                'income',
+                'Tiền sinh hoạt',
+                '1.200.000 ₫ · Thử ghi nhận khoản thu',
+                Icons.south_west_outlined,
+              ),
             ].map(
               (sample) => Padding(
                 padding: const EdgeInsets.only(bottom: 8),

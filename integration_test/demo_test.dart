@@ -10,10 +10,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:transfer_lens/data/transaction_repository.dart';
 import 'package:transfer_lens/domain/transaction.dart';
+import 'package:transfer_lens/domain/cash_flow.dart';
 import 'package:transfer_lens/main.dart';
 import 'package:transfer_lens/state/expense_store.dart';
 import 'package:transfer_lens/ui/home_screen.dart';
 import 'package:transfer_lens/ui/widgets/spending_charts.dart';
+import 'package:transfer_lens/ui/widgets/cash_flow_chart.dart';
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -98,45 +100,45 @@ void main() {
     debugPrint(
       'DEMO_STEP: TransferLens: ghi chi tiêu từ ảnh chuyển khoản thành công.',
     );
-    await hold(8);
+    await hold(4);
     await capture('01_dashboard_empty');
     await tapText('Nhập ảnh');
     debugPrint(
       'DEMO_STEP: Chọn ảnh từ thư viện, chụp ảnh hoặc thử dữ liệu giả.',
     );
     await capture('02_import');
-    await hold(8);
+    await hold(4);
     await reveal(find.text('Bữa trưa'));
     await tapText('Bữa trưa');
     debugPrint(
       'DEMO_STEP: ML Kit chạy OCR thật trên thiết bị. Kiểm tra số tiền và ngày.',
     );
-    await hold(8);
+    await hold(4);
     await capture('03_ocr_review');
     await reveal(find.byKey(const ValueKey('recipient')));
     debugPrint(
       'DEMO_STEP: Tách người gửi, người nhận và nội dung chuyển khoản.',
     );
     await capture('04_parties');
-    await hold(10);
+    await hold(3);
     await reveal(find.byType(DropdownButtonFormField<ExpenseCategory>));
     debugPrint('DEMO_STEP: Nội dung "an trua" gợi ý danh mục Ăn uống.');
     await capture('05_category_suggestion');
-    await hold(8);
+    await hold(3);
     await reveal(find.text('Văn bản OCR gốc'));
     await tapText('Văn bản OCR gốc');
-    await hold(6);
+    await hold(3);
     await tapText('Văn bản OCR gốc');
     await save();
     debugPrint(
       'DEMO_STEP: Xác nhận trước khi lưu. SQLite giữ dữ liệu và ảnh cục bộ.',
     );
     expect(store.transactions.single.amount, 150000);
-    await hold(6);
+    await hold(3);
 
     await importSample('Học phí');
     debugPrint('DEMO_STEP: Ảnh học phí được gợi ý vào danh mục Học tập.');
-    await hold(5);
+    await hold(3);
     await save();
     await importSample('Chuyển tiền');
     debugPrint(
@@ -144,13 +146,32 @@ void main() {
     );
     await reveal(find.byType(DropdownButtonFormField<ExpenseCategory>));
     await capture('06_manual_category');
-    await hold(8);
+    await hold(3);
     await tester.tap(find.byType(DropdownButtonFormField<ExpenseCategory>));
     await tester.pumpAndSettle();
     await tapText('Di chuyển');
-    await hold(4);
+    await hold(3);
     await save();
     expect(store.transactions.length, 3);
+    await importSample('Tiền sinh hoạt');
+    debugPrint(
+      'DEMO_STEP: Chọn Khoản thu cho tiền nhận vào; chọn danh mục Khác.',
+    );
+    await reveal(find.text('Khoản thu'));
+    await tapText('Khoản thu');
+    await reveal(find.byType(DropdownButtonFormField<ExpenseCategory>));
+    await tester.tap(find.byType(DropdownButtonFormField<ExpenseCategory>));
+    await tester.pumpAndSettle();
+    await tapText('Khác');
+    await hold(3);
+    await save();
+    expect(store.transactions.length, 4);
+    final cashFlow = CashFlowMonth.fromTransactions(
+      DateTime(2026, 10),
+      store.transactions,
+    );
+    expect(cashFlow.totalIncome, 1200000);
+    expect(cashFlow.totalExpense, 800000);
     await reveal(find.byType(CategoryChart));
     debugPrint(
       'DEMO_STEP: Biểu đồ donut vẽ bằng CustomPainter. Chạm danh mục để xem.',
@@ -164,7 +185,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     await capture('07_donut');
-    await hold(8);
+    await hold(3);
     await reveal(find.byType(WeeklyChart));
     debugPrint('DEMO_STEP: Biểu đồ chi tiêu tuần. Chạm ngày để xem số tiền.');
     await reveal(find.text('T4'));
@@ -175,35 +196,70 @@ void main() {
     );
     await tester.pumpAndSettle();
     await capture('08_weekly');
-    await hold(8);
+    await hold(3);
+    await reveal(find.byKey(const ValueKey('replay-cash-flow')));
+    await Scrollable.ensureVisible(
+      tester.element(find.text('Biến động thu / chi')),
+      alignment: .02,
+    );
+    await tester.pumpAndSettle();
+    debugPrint(
+      'DEMO_STEP: Biến động thu/chi: AnimationController vẽ hai đường theo ngày.',
+    );
+    await tester.tap(find.byKey(const ValueKey('replay-cash-flow')));
+    await tester.pumpAndSettle();
+    final plot = find.byKey(const ValueKey('cash-flow-plot'));
+    final rect = tester.getRect(plot);
+    await tester.tapAt(
+      Offset(rect.left + 8 + (rect.width - 16) * 2 / 30, rect.center.dy),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Thu: 1.200.000 ₫'), findsOneWidget);
+    await capture('12_cash_flow_light');
+    await hold(4);
     await tapText('Giao dịch');
     debugPrint('DEMO_STEP: Tìm kiếm, lọc và mở giao dịch để chỉnh sửa.');
     await capture('09_history');
-    await hold(8);
+    await hold(3);
     final first = find.text('LE MINH HOA');
     await tester.ensureVisible(first);
     await tester.tap(first);
     await tester.pumpAndSettle();
     await tester.enterText(find.byKey(const ValueKey('amount')), '210000');
-    await hold(4);
+    await hold(3);
     await reveal(find.byKey(const ValueKey('save')));
     await tester.tap(find.byKey(const ValueKey('save')));
     await tester.pumpAndSettle();
-    await hold(4);
+    await hold(3);
     await tester.tap(find.byTooltip('Cài đặt'));
     await tester.pumpAndSettle();
     await tapText('Giao diện tối');
     debugPrint(
       'DEMO_STEP: Material 3: giao diện tối và tùy chọn theo hệ thống.',
     );
-    await hold(4);
+    await hold(3);
     Navigator.of(tester.element(find.text('Cài đặt').last)).pop();
     await tester.pumpAndSettle();
     await capture('10_dark_history');
-    await hold(8);
+    await hold(4);
     await tapText('Tổng quan');
     await capture('11_dashboard_final');
-    await hold(8);
+    await hold(3);
+    await reveal(find.byType(CashFlowChart));
+    await Scrollable.ensureVisible(
+      tester.element(find.text('Biến động thu / chi')),
+      alignment: .02,
+    );
+    await tester.pumpAndSettle();
+    await capture('13_cash_flow_dark');
+    expect(
+      CashFlowMonth.fromTransactions(
+        DateTime(2026, 10),
+        store.transactions,
+      ).totalExpense,
+      810000,
+    );
+    await hold(3);
     await File(p.join(screenshotDir.path, 'metrics.txt')).writeAsString(
       store.transactions
           .map((t) => '${t.reference}: ${t.ocrMilliseconds} ms')
