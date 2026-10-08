@@ -24,6 +24,10 @@ Flutter + on-device Google ML Kit OCR + a Dart heuristic parser + SQLite + anima
 | 2-3 minute demonstration | [Download demo video](https://github.com/duongdatdev/transfer-lens/releases/download/v1.1.0/transfer-lens-demo.mp4) |
 | 2-4 page report | [Download technical PDF](https://github.com/duongdatdev/transfer-lens/releases/download/v1.1.0/transfer-lens-report.pdf) |
 
+The [completed report template](Mini-Project-3-Report-Template.md) contains the student
+information, deliverable links, feature checklist, architecture, four annotated
+screenshots and technical resolutions. The PDF follows the same five sections.
+
 The paper-receipt scenario has been adapted to user-provided **transfer confirmation
 images**. Sender/recipient replace merchant names, and transfer descriptions drive
 category suggestions. Optional camera capture remains implemented. See

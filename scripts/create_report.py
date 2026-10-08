@@ -55,7 +55,7 @@ def start_page(page, title, subtitle):
     c.setFont('ArialBold', 10)
     c.drawString(MARGIN, HEIGHT-44, 'TRANSFERLENS  /  MINI-PROJECT #3')
     c.setFillColor(INK)
-    c.setFont('ArialBold', 25)
+    c.setFont('ArialBold', 17 if page == 1 else 25)
     c.drawString(MARGIN, HEIGHT-81, title)
     paragraph(subtitle, MARGIN, HEIGHT-94, kind=small)
     c.setStrokeColor(HexColor('#D9E5DD'))
@@ -75,26 +75,28 @@ def table(rows, widths, y):
     t.drawOn(c, MARGIN, y-h)
     return y-h-12
 
-y = start_page(1, 'Short technical report', 'Official template: general information, feature checklist, architecture, empirical evidence and challenges.')
+y = start_page(1, 'MINI-PROJECT SHORT TECHNICAL REPORT', 'Completed course template - TransferLens 1.1.0 - transfer-image OCR and personal expense tracking.')
+y = paragraph('<b>Course:</b> Cross-Platform Mobile App Development (VKU)<br/><b>Mini-Project Title:</b> Mini-Project 3 - TransferLens: OCR Expense Tracker &amp; Transfer Parser<br/><b>Team / Student Name:</b> Dương Bảo Đạt (individual project)<br/><b>Submission Date:</b> 09/10/2026 | <b>Application Version:</b> 1.1.0', MARGIN, y)
 y = section('1. GENERAL INFORMATION &amp; DELIVERABLE LINKS', y)
-y = paragraph('<b>Course:</b> Cross-Platform Mobile App Development (VKU)<br/><b>Mini-Project Title:</b> Mini-Project 3 - OCR Expense Tracker &amp; Transfer Parser<br/><b>Student:</b> Dương Bảo Đạt | <b>Student ID:</b> 23IT046<br/><b>Team:</b> Individual | <b>Role:</b> Full-stack mobile developer | <b>Contribution:</b> 100%<br/><b>Submission date:</b> 09/10/2026 | <b>Version:</b> 1.1.0', MARGIN, y)
+y = paragraph('<b>Team Members:</b> Dương Bảo Đạt - <b>Student ID:</b> 23IT046<br/><b>Role:</b> Full-stack mobile developer (architecture, code, tests and documentation)<br/><b>Contribution:</b> 100%', MARGIN, y)
 if publication.get('published'):
-    y = paragraph(f'<b>GitHub:</b> <link href="{repo_url}" color="#176B58">{repo_url}</link><br/><b>APK + video:</b> <link href="{release_url}" color="#176B58">GitHub Release v1.1.0 - download all deliverables</link><br/><b>PDF:</b> transfer-lens-report.pdf (this report)', MARGIN, y)
+    asset_url = release_url.replace('/tag/', '/download/')
+    y = paragraph(f'<b>Live Demo URL / Signed APK:</b> <link href="{asset_url}/app-release.apk" color="#176B58">Download app-release.apk</link><br/><b>GitHub Repository:</b> <link href="{repo_url}" color="#176B58">{repo_url}</link><br/><b>Video Demo:</b> <link href="{asset_url}/transfer-lens-demo.mp4" color="#176B58">Native walkthrough - 2 minutes 36 seconds</link><br/><b>Technical Report PDF:</b> <link href="{asset_url}/transfer-lens-report.pdf" color="#176B58">Download four-page report</link>', MARGIN, y)
 else:
     y = paragraph('<b>Local deliverables:</b> app-release.apk; transfer-lens-demo.mp4; transfer-lens-report.pdf.<br/><b>Publication status:</b> GitHub repository creation returned HTTP 500 during preparation. Source and release assets are ready locally; public URLs are pending publication.', MARGIN, y)
 y = paragraph('<b>Adapted scenario:</b> Instead of paper receipts, the user imports a completed bank-transfer image. The parser extracts amount, date, sender/recipient and description. A keyword rule suggests a category; unknown descriptions require manual selection. This scope change follows the student request and is documented for instructor review.', MARGIN, y)
 y = section('2. FEATURE IMPLEMENTATION CHECKLIST', y)
 y = table([
-    ['Required feature', 'Status', 'Implementation / acceptance'],
-    ['Image input + crop', 'Implemented', 'Gallery screenshot import, native crop/rotate; optional camera with flash, focus and frame.'],
-    ['On-device OCR', 'Validated', 'Bundled ML Kit Latin model; native Android OCR exercised on fictional image assets.'],
-    ['Regex heuristics', 'Validated', 'VND, calendar date, explicit parties, description/reference; ambiguity and failure warnings.'],
-    ['Category + review', 'Validated', 'Five mapped categories plus Other; editable fields, confirmation and duplicate warning.'],
-    ['Provider + SQLite CRUD', 'Validated', 'Local records survive database reopen; full-size images and resized thumbnails cached privately.'],
-    ['Canvas visualizations', 'Validated', 'Animated donut, weekly bars and daily income/expense trend; tap inspection and replay.'],
-    ['Material 3 + accessibility', 'Validated', 'Light/dark/system, responsive layout, large-text and reduced-motion widget checks.'],
-    ['Release + report', 'Published', 'Signed APK, 2-3 minute native walkthrough, four-page report with regex table.'],
-], [132, 67, CW-199], y)
+    ['#', 'Required Feature', 'Status', 'Implementation Details & Acceptance Level'],
+    ['1', 'Image input + crop', 'Implemented', 'Gallery import, native crop/rotate; camera flash/focus/frame. Physical-device acceptance pending.'],
+    ['2', 'On-device OCR', 'Validated', 'Bundled ML Kit Latin model; four native demo images. Sub-100ms target not demonstrated.'],
+    ['3', 'Regex heuristics', 'Validated', 'VND, calendar date, explicit parties, description/reference; ambiguity and failure warnings.'],
+    ['4', 'Category + review', 'Validated', 'Five categories plus Other; editable fields, confirmation and duplicate warning.'],
+    ['5', 'Provider + SQLite CRUD', 'Validated', 'Database reopen tested; private original images, resized thumbnails and deletion cleanup.'],
+    ['6', 'Canvas visualizations', 'Validated', 'Animated donut, weekly bars and daily income/expense trend; selection, replay, reduced motion.'],
+    ['7', 'Material 3 + accessibility', 'Validated', 'Light/dark/system; phone/tablet, 200% text and reduced-motion widget checks.'],
+    ['8', 'Submission package', 'Published', 'Signed APK, 2:36 native video and four-page PDF. Physical Android and iOS checks pending.'],
+], [26, 106, 70, CW-202], y)
 if y < 45: raise RuntimeError('Page 1 overflow')
 c.showPage()
 
@@ -165,7 +167,7 @@ c.showPage()
 
 y = start_page(4, 'Challenges & resolutions', 'Design decisions, validation limits and the practical submission handoff.')
 y = section('5. TECHNICAL CHALLENGES &amp; RESOLUTIONS', y)
-y = paragraph('<b>Financial ambiguity:</b> Explicit amount labels outrank currency-only values; balance, fee, account and reference fields are excluded. Conflicting amounts or invalid dates require review. Only explicitly labeled parties are extracted.<br/><b>Animation and builds:</b> Daily values interpolate from the current frame during rapid updates. Calendar indexes handle leap years. Flexible legends support 200% text. R8 preserves native ML Kit registrar constructors; Windows Kotlin incremental caching is disabled across drives.', MARGIN, y)
+y = paragraph('<b>1. Financial ambiguity and native builds:</b> Amount labels outrank currency-only values; balance, fee, account and reference fields are excluded. Conflicts require review; parties require labels. R8 preserves ML Kit registrar constructors; cross-drive Kotlin incremental caching is disabled.<br/><b>2. Animation correctness and recording:</b> Daily values interpolate from the current frame; PathMetric reveals the line. Calendar indexes handle leap years. Reduced motion shows final values. Host-side ADB screenshots preserve live animation during recording.', MARGIN, y)
 y = section('OCR regex and heuristic table', y)
 y = table([
     ['Field', 'Rule / regex after normalization', 'Fallback'],
@@ -184,7 +186,6 @@ for label, url in [
     ('Google ML Kit: bundled Android text-recognition model', 'https://developers.google.com/ml-kit/vision/text-recognition/v2/android'),
     ('Flutter ML Kit plugin: mobile platforms and model setup', 'https://pub.dev/packages/google_mlkit_text_recognition'),
     ('Flutter CustomPainter: canvas rendering API', 'https://api.flutter.dev/flutter/rendering/CustomPainter-class.html'),
-    ('Original report structure: supplied Mini-Project-3-Report-Template.md', None),
     ('Course slides: Week 7 Part 1 (rubric p.42); Week 8 Part 2 (canvas pp.30-34, checklist p.43)', None),
 ]:
     text = f'<link href="{url}" color="#176B58">{escape(label)}</link>' if url else escape(label)
