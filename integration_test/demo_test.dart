@@ -35,8 +35,9 @@ void main() {
         'demo_screenshots',
       ),
     );
-    if (await screenshotDir.exists())
+    if (await screenshotDir.exists()) {
       await screenshotDir.delete(recursive: true);
+    }
     await screenshotDir.create(recursive: true);
     await tester.pumpWidget(
       ChangeNotifierProvider.value(

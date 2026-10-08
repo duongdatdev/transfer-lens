@@ -1,5 +1,6 @@
 """Record a Flutter integration walkthrough on a dedicated Android emulator."""
 from pathlib import Path
+import atexit
 import os
 import subprocess
 import time
@@ -20,9 +21,16 @@ LOG = ROOT / 'tmp/demo-test.log'
 LOG.parent.mkdir(parents=True, exist_ok=True)
 
 def adb(*args, **kwargs):
-    return subprocess.run([ADB, '-s', 'emulator-5554', *args], check=True, **kwargs)
+    for attempt in range(3):
+        try:
+            return subprocess.run([ADB, '-s', 'emulator-5554', *args], check=True, **kwargs)
+        except subprocess.CalledProcessError:
+            if attempt == 2: raise
+            subprocess.run([ADB, 'start-server'], capture_output=True)
+            time.sleep(1)
 
 recording = None
+test = None
 timeline = []
 seen_steps = set()
 recording_start = None
@@ -35,6 +43,17 @@ def stop_recording():
         pid = adb('shell', 'pidof', 'screenrecord', capture_output=True, text=True).stdout.strip()
         if pid: adb('shell', 'kill', '-2', pid)
         recording.wait(timeout=15)
+
+def cleanup():
+    try:
+        stop_recording()
+    except (subprocess.SubprocessError, OSError):
+        if recording is not None and recording.poll() is None:
+            recording.terminate()
+    if test is not None and test.poll() is None:
+        subprocess.run(['taskkill', '/PID', str(test.pid), '/T', '/F'], capture_output=True)
+
+atexit.register(cleanup)
 
 def export_screens():
     data = adb('exec-out', 'run-as', APP, 'cat', 'app_flutter/demo_screenshots/metrics.txt', capture_output=True).stdout
