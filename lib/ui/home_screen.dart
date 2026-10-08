@@ -3,12 +3,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../domain/cash_flow.dart';
 import '../domain/transaction.dart';
 import '../state/expense_store.dart';
 import 'app_theme.dart';
 import 'import_screen.dart';
 import 'review_screen.dart';
 import 'widgets/spending_charts.dart';
+import 'widgets/cash_flow_chart.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -257,6 +259,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [category, const SizedBox(height: 20), weekly],
                   );
           },
+        ),
+        const SizedBox(height: 20),
+        _chartCard(
+          'Biến động thu / chi',
+          'Tháng ${month.month}/${month.year} · Chạm điểm hoặc dùng nút đổi ngày',
+          CashFlowChart(data: CashFlowMonth.fromTransactions(month, monthly)),
         ),
         const SizedBox(height: 24),
         Row(
@@ -589,7 +597,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     'OCR ngoại tuyến. Không đăng nhập, không tải ảnh lên máy chủ. Xóa giao dịch sẽ xóa cả ảnh đã lưu.',
                   ),
                 ),
-                const Text('TransferLens 1.0.0 · Mini-Project #3'),
+                const Text('TransferLens 1.1.0 · Mini-Project #3'),
               ],
             ),
           ),
