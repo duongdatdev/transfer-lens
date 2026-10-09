@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#176b58">
+  <meta name="description" content="TransferLens: nhập ảnh chuyển khoản, nhận diện số tiền và theo dõi chi tiêu. Dùng thử trực tuyến, xem video và tải APK Android.">
+  <title>TransferLens — Demo & tải ứng dụng Android</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="demo.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Đến nội dung chính</a>
+  <header class="shell header">
+    <a class="brand" href="#" aria-label="TransferLens, đầu trang"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12V5h7M20 5h7v7M27 20v7h-7M12 27H5v-7M11 16h10M16 11v10"/></svg>TransferLens</a>
+    <nav aria-label="Điều hướng"><a href="#try">Dùng thử</a><a href="#install">Cài đặt</a><a class="source-link" href="https://github.com/duongdatdev/transfer-lens">GitHub <span aria-hidden="true">↗</span></a></nav>
+  </header>
+  <main id="main">
+    <section class="shell hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow">MINI-PROJECT 03 · FLUTTER & DART</p>
+        <h1 id="hero-title">Chuyển khoản xong.<br><span>Ghi chi tiêu gọn.</span></h1>
+        <p class="intro">Nhập ảnh chuyển khoản, kiểm tra số tiền và chọn danh mục. TransferLens giữ lại những khoản chi nhỏ, để bạn nhìn rõ cả tháng.</p>
+        <div class="actions"><a class="button primary" href="https://github.com/duongdatdev/transfer-lens/releases/download/v1.1.0/app-release.apk">Tải APK cho Android <span aria-hidden="true">↓</span></a><a class="button secondary" href="#try">Dùng thử trên web <span aria-hidden="true">↗</span></a></div>
+        <p class="download-meta">Phiên bản 1.1.0 · Android 7.0+ · 88,4 MB</p>
+        <ul class="benefits"><li>OCR trên thiết bị</li><li>Lưu dữ liệu cục bộ</li><li>Biểu đồ có animation</li></ul>
+      </div>
+      <figure class="app-preview">
+        <div class="preview-heading"><span>MỘT GÓC ỨNG DỤNG THẬT</span><span class="status-dot">Android</span></div>
+        <img src="assets/12_cash_flow_light.png" alt="Ứng dụng Android TransferLens với biểu đồ biến động thu chi theo ngày" width="720" height="1600" fetchpriority="high">
+        <figcaption>Thu, chi và biến động — trong một màn hình.</figcaption>
+      </figure>
+    </section>
+
+    <section class="section-tint" id="try" aria-labelledby="try-title">
+      <div class="shell">
+        <div class="section-heading"><div><p class="eyebrow">THỬ TRƯỚC KHI CÀI</p><h2 id="try-title">Một khoản chi. Một bức tranh rõ hơn.</h2></div><p>Bản xem trước tương tác dùng dữ liệu giả lập. Nhập ảnh và OCR thực hoạt động trong APK Android. Dữ liệu dùng thử chỉ ở trong bộ nhớ của tab này.</p></div>
+        <noscript><p class="notice">Bật JavaScript để dùng phần xem trước. Bạn vẫn có thể tải APK và xem video bên dưới.</p></noscript>
+        <div class="demo-grid">
+          <form id="demo-form" class="panel" aria-labelledby="review-title">
+            <div class="panel-top"><h3 id="review-title">Kiểm tra giao dịch mẫu</h3><span class="tag">Dữ liệu giả lập</span></div>
+            <fieldset class="samples"><legend>Chọn nội dung mẫu</legend><div><button type="button" data-sample="food" aria-pressed="true">Ăn trưa</button><button type="button" data-sample="study" aria-pressed="false">Học phí</button><button type="button" data-sample="unknown" aria-pressed="false">Chưa rõ</button></div></fieldset>
+            <label for="description">Nội dung chuyển khoản</label><input id="description" name="description" value="Thanh toan an trua" maxlength="160" required>
+            <div class="field-row"><div><label for="amount">Số tiền (VND)</label><input id="amount" name="amount" value="150000" inputmode="numeric" pattern="[0-9., ]+" maxlength="16" required aria-describedby="amount-hint"><small id="amount-hint">Ví dụ: 150000 hoặc 150.000</small></div><div><label for="direction">Loại giao dịch</label><select id="direction" name="direction"><option value="expense">Khoản chi</option><option value="income">Khoản thu</option></select></div></div>
+            <label for="category">Danh mục</label><select id="category" name="category" required><option value="">Chọn danh mục</option><option value="food">Ăn uống</option><option value="study">Học tập</option><option value="travel">Di chuyển</option><option value="gear">Mua sắm</option><option value="entertainment">Giải trí</option><option value="other">Khác</option></select>
+            <p id="suggestion" class="suggestion" aria-live="polite">Gợi ý từ nội dung: Ăn uống. Bạn có thể sửa lại.</p>
+            <button class="button primary full" type="submit">Thêm vào biểu đồ <span aria-hidden="true">→</span></button>
+            <p id="form-status" class="form-status" role="status"></p>
+          </form>
+          <div class="panel stats" aria-labelledby="chart-title">
+            <div class="panel-top"><h3 id="chart-title">Phân bổ chi tiêu mẫu</h3><button id="reset-demo" class="text-button" type="button">Đặt lại</button></div>
+            <div class="totals"><div><span>Tổng chi</span><strong id="expense-total">800.000 ₫</strong></div><div><span>Tổng thu</span><strong id="income-total">1.200.000 ₫</strong></div></div>
+            <div class="chart-layout"><div class="donut-wrap"><svg id="donut" viewBox="0 0 120 120" role="img" aria-labelledby="donut-title"><title id="donut-title">Phân bổ chi tiêu theo danh mục; các giá trị được liệt kê bên cạnh.</title><circle class="donut-track" cx="60" cy="60" r="48"/></svg><div class="donut-label"><span id="selection-label">Tổng chi</span><strong id="selection-value">800.000 ₫</strong></div></div><div id="legend" class="legend" aria-label="Chọn danh mục để xem số tiền"></div></div>
+            <div class="net"><span>Chênh lệch thu − chi</span><strong id="net-total">400.000 ₫</strong></div>
+            <p class="hint">Chạm vào tên danh mục để xem số tiền. Biểu đồ cập nhật khi bạn thêm giao dịch.</p>
+            <h4>Giao dịch vừa thêm</h4><ul id="recent" class="recent"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="shell video-section" aria-labelledby="video-title">
+      <div><p class="eyebrow">DEMO ỨNG DỤNG ANDROID</p><h2 id="video-title">Xem toàn bộ luồng.<br>Từ ảnh đến biểu đồ.</h2><p class="intro">2 phút 36 giây: OCR ảnh chuyển khoản, sửa thông tin, chọn danh mục, lưu giao dịch và xem biểu đồ thu chi cập nhật.</p><ol class="steps"><li><span>01</span><div><strong>Nhập ảnh</strong><p>Chọn ảnh xác nhận chuyển khoản hoặc chụp ảnh mới.</p></div></li><li><span>02</span><div><strong>Kiểm tra rồi lưu</strong><p>Sửa số tiền, ngày, người gửi/nhận và danh mục trước khi xác nhận.</p></div></li><li><span>03</span><div><strong>Theo dõi biến động</strong><p>Xem donut, biểu đồ cột tuần và đường thu chi có animation.</p></div></li></ol></div>
+      <div class="video-frame"><video controls playsinline preload="none" poster="assets/03_ocr_review.png" width="720" height="1780" aria-label="Video demo TransferLens trên Android, chú thích tiếng Việt"><source src="demo.mp4" type="video/mp4">Trình duyệt của bạn không hỗ trợ video.</video><a href="https://github.com/duongdatdev/transfer-lens/releases/download/v1.1.0/transfer-lens-demo.mp4">Tải video demo nếu không phát được <span aria-hidden="true">↗</span></a></div>
+    </section>
+
+    <section class="shell install-section" id="install" aria-labelledby="install-title">
+      <div class="install-card"><div><p class="eyebrow">CÀI ĐẶT TRÊN ĐIỆN THOẠI</p><h2 id="install-title">Mang TransferLens<br>vào chiếc Android của bạn.</h2><p>APK đã ký · Phiên bản 1.1.0 · Android 7.0 trở lên</p><a class="button primary" href="https://github.com/duongdatdev/transfer-lens/releases/download/v1.1.0/app-release.apk">Tải app-release.apk <span aria-hidden="true">↓</span></a><p class="platform-note">iPhone/iPad có thể dùng thử web và xem video. APK chỉ cài được trên Android.</p></div><div class="install-instructions"><h3>Ba bước để bắt đầu</h3><ol><li>Mở trang này bằng Chrome hoặc trình duyệt trên Android, rồi nhấn tải APK.</li><li>Mở tệp đã tải. Nếu Android yêu cầu, cho phép trình duyệt cài ứng dụng từ nguồn này.</li><li>Nhấn <strong>Cài đặt</strong>, mở TransferLens và chọn ảnh chuyển khoản để kiểm tra.</li></ol><p>Nếu mở trong trình duyệt của Zalo/Facebook không tải được, hãy chọn “Mở bằng trình duyệt”.</p><a href="https://github.com/duongdatdev/transfer-lens/releases/tag/v1.1.0">Xem bản phát hành & mã kiểm tra SHA-256 <span aria-hidden="true">↗</span></a></div></div>
+    </section>
+  </main>
+  <footer class="shell footer"><div><a class="brand" href="#">TransferLens</a><p>Dương Bảo Đạt · 23IT046 · VKU<br>Mini-Project 3 · Cross-Platform Mobile App Development</p></div><div class="footer-links"><a href="https://github.com/duongdatdev/transfer-lens">Mã nguồn GitHub</a><a href="https://github.com/duongdatdev/transfer-lens/releases/download/v1.1.0/transfer-lens-report.pdf">Báo cáo PDF</a><a href="https://github.com/duongdatdev/transfer-lens/blob/main/Mini-Project-3-Report-Template.md">Báo cáo theo mẫu</a></div></footer>
+</body>
+</html>

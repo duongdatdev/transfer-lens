@@ -31,6 +31,7 @@ publication_file = ROOT / 'docs/publication.json'
 publication = json.loads(publication_file.read_text('utf-8')) if publication_file.exists() else {'published': False}
 repo_url = publication.get('repository', 'https://github.com/duongdatdev/transfer-lens')
 release_url = publication.get('release', repo_url + '/releases/tag/v1.1.0')
+live_url = publication.get('live_demo', '')
 metrics_file = ROOT / 'docs/screenshots/metrics.txt'
 metrics = metrics_file.read_text('utf-8') if metrics_file.exists() else 'See on-screen measured OCR durations in the demonstration.'
 style = ParagraphStyle('Body', fontName='Arial', fontSize=9.5, leading=14, textColor=INK)
@@ -81,7 +82,8 @@ y = section('1. GENERAL INFORMATION &amp; DELIVERABLE LINKS', y)
 y = paragraph('<b>Team Members:</b> Dương Bảo Đạt - <b>Student ID:</b> 23IT046<br/><b>Role:</b> Full-stack mobile developer (architecture, code, tests and documentation)<br/><b>Contribution:</b> 100%', MARGIN, y)
 if publication.get('published'):
     asset_url = release_url.replace('/tag/', '/download/')
-    y = paragraph(f'<b>Live Demo URL / Signed APK:</b> <link href="{asset_url}/app-release.apk" color="#176B58">Download app-release.apk</link><br/><b>GitHub Repository:</b> <link href="{repo_url}" color="#176B58">{repo_url}</link><br/><b>Video Demo:</b> <link href="{asset_url}/transfer-lens-demo.mp4" color="#176B58">Native walkthrough - 2 minutes 36 seconds</link><br/><b>Technical Report PDF:</b> <link href="{asset_url}/transfer-lens-report.pdf" color="#176B58">Download four-page report</link>', MARGIN, y)
+    live_link = f'<b>Live Demo URL:</b> <link href="{live_url}" color="#176B58">{live_url}</link> (sample preview + Android install)<br/>' if live_url else ''
+    y = paragraph(live_link + f'<b>Signed APK:</b> <link href="{asset_url}/app-release.apk" color="#176B58">Download app-release.apk</link><br/><b>GitHub Repository:</b> <link href="{repo_url}" color="#176B58">{repo_url}</link><br/><b>Video Demo:</b> <link href="{asset_url}/transfer-lens-demo.mp4" color="#176B58">Native walkthrough - 2 minutes 36 seconds</link><br/><b>Technical Report PDF:</b> <link href="{asset_url}/transfer-lens-report.pdf" color="#176B58">Download four-page report</link>', MARGIN, y)
 else:
     y = paragraph('<b>Local deliverables:</b> app-release.apk; transfer-lens-demo.mp4; transfer-lens-report.pdf.<br/><b>Publication status:</b> GitHub repository creation returned HTTP 500 during preparation. Source and release assets are ready locally; public URLs are pending publication.', MARGIN, y)
 y = paragraph('<b>Adapted scenario:</b> Instead of paper receipts, the user imports a completed bank-transfer image. The parser extracts amount, date, sender/recipient and description. A keyword rule suggests a category; unknown descriptions require manual selection. This scope change follows the student request and is documented for instructor review.', MARGIN, y)

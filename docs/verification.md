@@ -1,5 +1,10 @@
 # Verification evidence - 09/10/2026 (v1.1.0)
 
+- Cloudflare Pages web preview: category suggestion, unknown-description manual
+  selection, grouped VND entry, expense/income totals and reset checked in browser.
+  Layout has no horizontal overflow at 375px, 768px, 812px landscape and 1440px.
+  Emulated reduced motion disables the donut animation. The web preview uses
+  fictional data and does not perform native OCR or persist transactions.
 - `flutter analyze`: no issues.
 - `flutter test`: 41 passing unit/widget tests. Coverage includes 375px phones,
   landscape/tablet, light/dark, 200% text, review validation and chart selection.

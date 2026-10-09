@@ -54,4 +54,6 @@ output/
 tmp/
 *.mp4
 android/.kotlin/
+node_modules/
+.wrangler/
 

@@ -9,7 +9,8 @@
 
 ## 1. GENERAL INFORMATION & DELIVERABLE LINKS
 * **Team Members:** Dương Bảo Đạt - Student ID: **23IT046** - Role: Full-stack mobile developer (architecture, implementation, testing and documentation) - Contribution: **100%**.
-* **🔗 Live Demo URL / Signed APK:** [Download app-release.apk](https://github.com/duongdatdev/transfer-lens/releases/download/v1.1.0/app-release.apk).
+* **🔗 Live Demo URL:** [TransferLens on Cloudflare Pages](https://transfer-lens.pages.dev/) - mobile-friendly interactive preview, native demo video and Android installation instructions. The browser preview uses fictional data; actual image OCR runs in the Android APK.
+* **Signed APK:** [Download app-release.apk](https://github.com/duongdatdev/transfer-lens/releases/download/v1.1.0/app-release.apk).
 * **💻 GitHub Repository:** [duongdatdev/transfer-lens](https://github.com/duongdatdev/transfer-lens).
 * **🎥 Video Demo:** [Download the 2-minute 36-second demonstration](https://github.com/duongdatdev/transfer-lens/releases/download/v1.1.0/transfer-lens-demo.mp4).
 * **Technical Report PDF:** [Download the four-page report](https://github.com/duongdatdev/transfer-lens/releases/download/v1.1.0/transfer-lens-report.pdf).

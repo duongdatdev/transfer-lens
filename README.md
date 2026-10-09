@@ -19,6 +19,7 @@ Flutter + on-device Google ML Kit OCR + a Dart heuristic parser + SQLite + anima
 
 | Deliverable | Link |
 | --- | --- |
+| Mobile live demo + installation | [Open TransferLens on Cloudflare Pages](https://transfer-lens.pages.dev/) |
 | Public source | [GitHub repository](https://github.com/duongdatdev/transfer-lens) |
 | Signed Android APK | [Download app-release.apk](https://github.com/duongdatdev/transfer-lens/releases/download/v1.1.0/app-release.apk) |
 | 2-3 minute demonstration | [Download demo video](https://github.com/duongdatdev/transfer-lens/releases/download/v1.1.0/transfer-lens-demo.mp4) |
@@ -27,6 +28,21 @@ Flutter + on-device Google ML Kit OCR + a Dart heuristic parser + SQLite + anima
 The [completed report template](Mini-Project-3-Report-Template.md) contains the student
 information, deliverable links, feature checklist, architecture, four annotated
 screenshots and technical resolutions. The PDF follows the same five sections.
+
+The live website includes an interactive preview with fictional transactions, the
+native demo video and Android APK installation instructions. Actual image OCR and
+SQLite persistence run in the Android app. iPhone/iPad can view the website and
+video; APK installation requires Android.
+
+To publish changes using the installed, authenticated Wrangler CLI:
+
+```powershell
+python scripts/prepare_site.py
+wrangler pages deploy output/site --project-name transfer-lens --branch main
+```
+
+See [Cloudflare deployment instructions](docs/deployment.md) for local preview and
+video preparation on a fresh checkout.
 
 The paper-receipt scenario has been adapted to user-provided **transfer confirmation
 images**. Sender/recipient replace merchant names, and transfer descriptions drive

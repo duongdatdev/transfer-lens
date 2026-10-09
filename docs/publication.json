@@ -1,5 +1,6 @@
 {
   "published": true,
   "repository": "https://github.com/duongdatdev/transfer-lens",
-  "release": "https://github.com/duongdatdev/transfer-lens/releases/tag/v1.1.0"
+  "release": "https://github.com/duongdatdev/transfer-lens/releases/tag/v1.1.0",
+  "live_demo": "https://transfer-lens.pages.dev/"
 }

@@ -6,6 +6,7 @@
 
 ## Deliverables
 
+- [Mobile live demo and Android installation](https://transfer-lens.pages.dev/)
 - [Public repository](https://github.com/duongdatdev/transfer-lens)
 - [Signed release APK](https://github.com/duongdatdev/transfer-lens/releases/download/v1.1.0/app-release.apk)
 - [Demo video](https://github.com/duongdatdev/transfer-lens/releases/download/v1.1.0/transfer-lens-demo.mp4)
